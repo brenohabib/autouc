@@ -8,8 +8,19 @@ def run(playwright: Playwright) -> None:
     context = browser.new_context()
     page = context.new_page()
     page.goto("http://192.168.0.1/")
+
+    page.wait_for_load_state("load")
+    
     page.get_by_role("textbox", name="Senha").fill("dominet123")
     page.get_by_role("textbox", name="Senha").press("Enter")
+
+    logged_button = page.locator("#confirm-yes")
+
+    if logged_button.is_visible(): # Refatorar
+        logged_button.click()
+    
+    page.locator(".g-loading-waiting-icon").wait_for(state="hidden") # Refatorar
+    
     page.get_by_text("Avançado", exact=True).click()
     page.get_by_role("link", name="Ferramentas de Sistema").click()
     page.get_by_role("link", name="- Backup e Recuperação").click()
