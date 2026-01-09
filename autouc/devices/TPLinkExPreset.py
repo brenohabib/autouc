@@ -19,7 +19,7 @@ def run(playwright: Playwright) -> None:
     if logged_button.is_visible(): # Refatorar
         logged_button.click()
     
-    page.locator(".g-loading-waiting-icon").wait_for(state="hidden") # Refatorar
+    time.sleep(2)
     
     page.get_by_text("Avançado", exact=True).click()
     page.get_by_role("link", name="Ferramentas de Sistema").click()
