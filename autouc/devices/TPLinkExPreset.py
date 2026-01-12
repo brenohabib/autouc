@@ -8,32 +8,28 @@ def run(playwright: Playwright) -> None:
     context = browser.new_context()
     page = context.new_page()
     page.goto("http://192.168.0.1/")
-
     page.wait_for_load_state("load")
-    
     page.get_by_role("textbox", name="Senha").fill("dominet123")
     page.get_by_role("textbox", name="Senha").press("Enter")
-
     logged_button = page.locator("#confirm-yes")
-
-    if logged_button.is_visible(): # Refatorar
+    if logged_button.is_visible():
         logged_button.click()
-    
     time.sleep(2)
-    
     page.get_by_text("Avançado", exact=True).click()
     page.get_by_role("link", name="Ferramentas de Sistema").click()
     page.get_by_role("link", name="- Backup e Recuperação").click()
     file_input = page.locator('#filename')
     file_input.set_input_files("./preset.bin")
     page.locator("#t_restore").click()
-
     time.sleep(4)
-
-    # ---------------------
     context.close()
     browser.close()
 
 
-with sync_playwright() as playwright:
-    run(playwright)
+def run_standalone() -> None:
+    with sync_playwright() as playwright:
+        run(playwright)
+
+
+if __name__ == "__main__":
+    run_standalone()

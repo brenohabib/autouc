@@ -7,19 +7,14 @@ def run(playwright: Playwright) -> None:
     browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
     page = context.new_page()
-    
     page.goto("http://192.168.0.1/")
-    
     page.wait_for_load_state("load")
-    
     page.get_by_text("Nova Senha").click()
     page.get_by_role("textbox", name="Nova Senha").fill("dominet123")
     page.get_by_text("Confirmar Senha").click()
     page.get_by_role("textbox", name="Confirmar Senha").fill("dominet123")
     page.get_by_role("button", name="Salvar").click()
-
-    time.sleep(1) # Refatorar
-    
+    time.sleep(1)
     page.get_by_role("textbox", name="Senha").click()
     page.get_by_role("textbox", name="Senha").fill("dominet123")
     page.get_by_role("textbox", name="Senha").press("Enter")
@@ -31,13 +26,15 @@ def run(playwright: Playwright) -> None:
     file_input = page.locator('#filename')
     file_input.set_input_files("./firmware.bin")
     page.get_by_role("button", name="Atualização").click()
-
-    time.sleep(4) # Refatorar
-
-    # ---------------------
+    time.sleep(4)
     context.close()
     browser.close()
 
 
-with sync_playwright() as playwright:
-    run(playwright)
+def run_standalone() -> None:
+    with sync_playwright() as playwright:
+        run(playwright)
+
+
+if __name__ == "__main__":
+    run_standalone()

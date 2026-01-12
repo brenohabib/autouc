@@ -1,0 +1,120 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Device Setup</title>
+    <link rel="stylesheet" href="{% static 'index.css' %}">
+</head>
+<body>
+    <div class="page">
+        <h1 class="page-title">Device Setup</h1>
+        <div class="device-card">
+            <div class="device-visual">
+                <div class="device-header">
+                    <span class="device-name">TP-Link EX</span>
+                    <span id="device-status-dot" class="status-dot status-offline"></span>
+                </div>
+                <div class="device-body">
+                    <div class="device-shape"></div>
+                </div>
+                <div class="device-footer">
+                    <span class="status-label">Status:</span>
+                    <span id="device-status-text" class="status-text">OFFLINE</span>
+                </div>
+            </div>
+            <div class="device-actions">
+                <button id="btn-update-firmware" class="action-button primary">Firmware</button>
+                <button id="btn-use-preset" class="action-button secondary">Preset</button>
+            </div>
+        </div>
+    </div>
+    <script>
+        function getCookie(name) {
+            const value = document.cookie;
+            if (!value) return null;
+            const parts = value.split(";");
+            for (let i = 0; i < parts.length; i++) {
+                const cookie = parts[i].trim();
+                if (cookie.startsWith(name + "=")) {
+                    return decodeURIComponent(cookie.substring(name.length + 1));
+                }
+            }
+            return null;
+        }
+
+        const statusDot = document.getElementById("device-status-dot");
+        const statusText = document.getElementById("device-status-text");
+        const btnUpdateFirmware = document.getElementById("btn-update-firmware");
+        const btnUsePreset = document.getElementById("btn-use-preset");
+
+        let busy = false;
+
+        function setStatus(status) {
+            const normalized = status.toUpperCase();
+            statusText.textContent = normalized;
+            statusDot.className = "status-dot status-" + normalized.toLowerCase();
+        }
+
+        async function refreshStatus() {
+            if (busy) {
+                return;
+            }
+            try {
+                const response = await fetch("/api/device/status/");
+                if (!response.ok) {
+                    return;
+                }
+                const data = await response.json();
+                if (data && typeof data.status === "string") {
+                    setStatus(data.status);
+                }
+            } catch (e) {
+            }
+        }
+
+        function setBusyState(state) {
+            busy = state;
+            btnUpdateFirmware.disabled = state;
+            btnUsePreset.disabled = state;
+        }
+
+        async function callAction(url) {
+            setBusyState(true);
+            setStatus("UPDATING");
+            const csrfToken = getCookie("csrftoken");
+            const headers = {};
+            if (csrfToken) {
+                headers["X-CSRFToken"] = csrfToken;
+            }
+            try {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: headers,
+                });
+                if (!response.ok) {
+                    setStatus("FAILED");
+                    return;
+                }
+                setStatus("ONLINE");
+            } catch (e) {
+                setStatus("FAILED");
+            } finally {
+                setBusyState(false);
+            }
+        }
+
+        btnUpdateFirmware.addEventListener("click", function () {
+            callAction("/api/device/update-firmware/");
+        });
+
+        btnUsePreset.addEventListener("click", function () {
+            callAction("/api/device/use-preset/");
+        });
+
+        refreshStatus();
+        setInterval(refreshStatus, 5000);
+    </script>
+</body>
+</html>

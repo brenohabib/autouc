@@ -16,9 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-from .web import view_example
+from .web import index, device_status, update_firmware, use_preset
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('current_datetime/', view_example.current_datetime),
+    path("", index, name="device-ui"),
+    path("api/device/status/", device_status, name="device-status"),
+    path("api/device/update-firmware/", update_firmware, name="device-update-firmware"),
+    path("api/device/use-preset/", use_preset, name="device-use-preset"),
+    path("admin/", admin.site.urls),
 ]
