@@ -29,6 +29,26 @@
                 <button id="btn-use-preset" class="action-button secondary">Preset</button>
             </div>
         </div>
+        <div class="device-card">
+            <div class="device-visual">
+                <div class="device-header">
+                    <span class="device-name">Data</span>
+                    <span id="data-device-status-dot" class="status-dot status-offline"></span>
+                </div>
+                <div class="device-body">
+                    <div class="device-shape">
+                    </div>
+                </div>
+                <div class="device-footer">
+                    <span class="status-label">Status:</span>
+                    <span id="data-device-status-text" class="status-text">OFFLINE</span>
+                </div>
+            </div>
+            <div class="device-actions">
+                <button id="btn-data-update-firmware" class="action-button primary">Firmware</button>
+                <button id="btn-data-use-preset" class="action-button secondary">Preset</button>
+            </div>
+        </div>
     </div>
     <script>
         function getCookie(name) {
@@ -46,8 +66,12 @@
 
         const statusDot = document.getElementById("device-status-dot");
         const statusText = document.getElementById("device-status-text");
+        const dataStatusDot = document.getElementById("data-device-status-dot");
+        const dataStatusText = document.getElementById("data-device-status-text");
         const btnUpdateFirmware = document.getElementById("btn-update-firmware");
         const btnUsePreset = document.getElementById("btn-use-preset");
+        const btnDataUpdateFirmware = document.getElementById("btn-data-update-firmware");
+        const btnDataUsePreset = document.getElementById("btn-data-use-preset");
 
         let busy = false;
 
@@ -55,6 +79,10 @@
             const normalized = status.toUpperCase();
             statusText.textContent = normalized;
             statusDot.className = "status-dot status-" + normalized.toLowerCase();
+            if (dataStatusText && dataStatusDot) {
+                dataStatusText.textContent = normalized;
+                dataStatusDot.className = "status-dot status-" + normalized.toLowerCase();
+            }
         }
 
         async function refreshStatus() {
@@ -78,6 +106,10 @@
             busy = state;
             btnUpdateFirmware.disabled = state;
             btnUsePreset.disabled = state;
+            if (btnDataUpdateFirmware && btnDataUsePreset) {
+                btnDataUpdateFirmware.disabled = state;
+                btnDataUsePreset.disabled = state;
+            }
         }
 
         async function callAction(url) {
@@ -111,6 +143,14 @@
 
         btnUsePreset.addEventListener("click", function () {
             callAction("/api/device/use-preset/");
+        });
+
+        btnDataUpdateFirmware.addEventListener("click", function () {
+            callAction("/api/device/data/update-firmware/");
+        });
+
+        btnDataUsePreset.addEventListener("click", function () {
+            callAction("/api/device/data/use-preset/");
         });
 
         refreshStatus();
