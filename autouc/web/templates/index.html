@@ -140,20 +140,20 @@
             }
         }
 
-        btnUpdateFirmware.addEventListener("click", async function () {
-            await callAction("/api/device/update-firmware/");
+        btnUpdateFirmware.addEventListener("click", function () {
+            callAction("/api/device/update-firmware/");
         });
 
         btnUsePreset.addEventListener("click", function () {
             callAction("/api/device/use-preset/");
         });
 
-        btnDataUpdateFirmware.addEventListener("click", async function () {
-            await callAction("/api/device/data/update-firmware/");
+        btnDataUpdateFirmware.addEventListener("click", function () {
+            callAction("/api/device/data/update-firmware/");
         });
 
-        btnDataUsePreset.addEventListener("click", async function () {
-            await callAction("/api/device/data/use-preset/");
+        btnDataUsePreset.addEventListener("click", function () {
+            callAction("/api/device/data/use-preset/");
         });
     </script>
 </body>

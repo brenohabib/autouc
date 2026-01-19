@@ -34,47 +34,35 @@ def device_status(request):
 
 @require_POST
 def update_firmware(request):
-    from playwright.sync_api import sync_playwright
-
     try:
-        with sync_playwright() as playwright:
-            TPLinkExFirmware.run(playwright)
+        TPLinkExFirmware.run_standalone()
         return JsonResponse({"ok": True})
-    except Exception:
-        return JsonResponse({"ok": False}, status=500)
+    except Exception as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=500)
 
 
 @require_POST
 def use_preset(request):
-    from playwright.sync_api import sync_playwright
-
     try:
-        with sync_playwright() as playwright:
-            TPLinkExPreset.run(playwright)
+        TPLinkExPreset.run_standalone()
         return JsonResponse({"ok": True})
-    except Exception:
-        return JsonResponse({"ok": False}, status=500)
+    except Exception as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=500)
 
 
 @require_POST
 def data_update_firmware(request):
-    from playwright.sync_api import sync_playwright
-
     try:
-        with sync_playwright() as playwright:
-            DataFirmware.run(playwright)
+        DataFirmware.run_standalone()
         return JsonResponse({"ok": True})
-    except Exception:
-        return JsonResponse({"ok": False}, status=500)
+    except Exception as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=500)
 
 
 @require_POST
 def data_use_preset(request):
-    from playwright.sync_api import sync_playwright
-
     try:
-        with sync_playwright() as playwright:
-            DataPreset.run(playwright)
+        DataPreset.run_standalone()
         return JsonResponse({"ok": True})
-    except Exception:
-        return JsonResponse({"ok": False}, status=500)
+    except Exception as exc:
+        return JsonResponse({"ok": False, "error": str(exc)}, status=500)
