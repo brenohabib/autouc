@@ -8,6 +8,9 @@
     <link rel="stylesheet" href="{% static 'index.css' %}">
 </head>
 <body>
+    <form method="post" style="display: none;">
+        {% csrf_token %}
+    </form>
     <div class="page">
         <div class="device-card">
             <div class="device-visual">
