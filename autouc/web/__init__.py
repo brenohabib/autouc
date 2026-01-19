@@ -1,6 +1,4 @@
-import platform
-import subprocess
-
+import os
 from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
@@ -12,12 +10,12 @@ DEVICE_IP = "192.168.0.1"
 
 
 def ping_device(ip: str) -> bool:
-    system = platform.system().lower()
-    count_param = "-n" if system == "windows" else "-c"
-    command = ["ping", count_param, "1", ip]
+    param = '-n' if os.name == 'nt' else '-c'
+    hostname = ip
     try:
-        result = subprocess.run(command, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        return result.returncode == 0
+        response = os.system(f"ping {param} 1 {hostname}")
+        print(f"Ping {hostname} returned {response}")
+        return response == 0
     except Exception:
         return False
 
