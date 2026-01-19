@@ -17,10 +17,8 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from .web import (
-    data_device_status,
     data_update_firmware,
     data_use_preset,
-    device_status,
     index,
     update_firmware,
     use_preset,
@@ -28,10 +26,8 @@ from .web import (
 
 urlpatterns = [
     path("", index, name="device-ui"),
-    path("api/device/status/", device_status, name="device-status"),
     path("api/device/update-firmware/", update_firmware, name="device-update-firmware"),
     path("api/device/use-preset/", use_preset, name="device-use-preset"),
-    path("api/data/status/", data_device_status, name="data-device-status"),
     path("api/data/update-firmware/", data_update_firmware, name="data-device-update-firmware"),
     path("api/data/use-preset/", data_use_preset, name="data-device-use-preset"),
     path("admin/", admin.site.urls),

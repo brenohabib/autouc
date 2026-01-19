@@ -44,29 +44,6 @@
     font-weight: 600;  
 }
 
-.status-dot {
-    width: 12px;
-    height: 12px;
-    border-radius: 999px;
-
-}
-
-.status-online {
-    background-color: #22c55e;
-}
-
-.status-updating {
-    background-color: #eab308;
-}
-
-.status-failed {
-    background-color: #ef4444;
-}
-
-.status-offline {
-    background-color: #6b7280;
-}
-
 .device-body {
     flex: 1;
     display: flex;
