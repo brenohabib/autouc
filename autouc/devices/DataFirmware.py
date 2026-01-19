@@ -1,5 +1,6 @@
 import time
 import re
+from pathlib import Path
 from playwright.sync_api import Playwright, sync_playwright, expect
 
 
@@ -14,7 +15,8 @@ def run(playwright: Playwright) -> None:
     page.get_by_role("button", name=" Login").click()
     page.get_by_text("Management", exact=True).click()
     page.get_by_role("menuitem", name="Firmware Update").click()
-    page.locator('.el-upload__input').set_input_files("./V3.2.8_sinal.img")
+    firmware_path = Path(__file__).resolve().parent / "V3.2.8_sinal.img"
+    page.locator('.el-upload__input').set_input_files(str(firmware_path))
     page.get_by_role("button", name=" Upgrade").click()
     page.get_by_role("button", name="Confirm").click()
     time.sleep(50)

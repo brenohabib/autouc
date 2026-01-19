@@ -32,6 +32,27 @@
                 <button id="btn-use-preset" class="action-button secondary">Preset</button>
             </div>
         </div>
+        <div style="height: 24px;"></div>
+        <div class="device-card">
+            <div class="device-visual">
+                <div class="device-header">
+                    <span class="device-name">Data</span>
+                    <span id="data-status-dot" class="status-dot status-offline"></span>
+                </div>
+                <div class="device-body">
+                    <div class="device-shape">
+                    </div>
+                </div>
+                <div class="device-footer">
+                    <span class="status-label">Status:</span>
+                    <span id="data-status-text" class="status-text">OFFLINE</span>
+                </div>
+            </div>
+            <div class="device-actions">
+                <button id="btn-data-update-firmware" class="action-button primary">Firmware</button>
+                <button id="btn-data-use-preset" class="action-button secondary">Preset</button>
+            </div>
+        </div>
     </div>
     <script>
         function getCookie(name) {
@@ -47,77 +68,101 @@
             return null;
         }
 
-        const statusDot = document.getElementById("device-status-dot");
-        const statusText = document.getElementById("device-status-text");
-        const btnUpdateFirmware = document.getElementById("btn-update-firmware");
-        const btnUsePreset = document.getElementById("btn-use-preset");
+        function createDeviceController(options) {
+            const statusDot = document.getElementById(options.statusDotId);
+            const statusText = document.getElementById(options.statusTextId);
+            const btnUpdateFirmware = document.getElementById(options.firmwareBtnId);
+            const btnUsePreset = document.getElementById(options.presetBtnId);
 
-        let busy = false;
+            let busy = false;
 
-        function setStatus(status) {
-            const normalized = status.toUpperCase();
-            statusText.textContent = normalized;
-            statusDot.className = "status-dot status-" + normalized.toLowerCase();
-        }
-
-        async function refreshStatus() {
-            if (busy) {
-                return;
+            function setStatus(status) {
+                const normalized = String(status || "").toUpperCase();
+                statusText.textContent = normalized || "OFFLINE";
+                statusDot.className = "status-dot status-" + (normalized || "offline").toLowerCase();
             }
-            try {
-                const response = await fetch("/api/device/status/");
-                if (!response.ok) {
+
+            async function refreshStatus() {
+                if (busy) {
                     return;
                 }
-                const data = await response.json();
-                if (data && typeof data.status === "string") {
-                    setStatus(data.status);
+                try {
+                    const response = await fetch(options.statusUrl);
+                    if (!response.ok) {
+                        return;
+                    }
+                    const data = await response.json();
+                    if (data && typeof data.status === "string") {
+                        setStatus(data.status);
+                    }
+                } catch (e) {
                 }
-            } catch (e) {
             }
-        }
 
-        function setBusyState(state) {
-            busy = state;
-            btnUpdateFirmware.disabled = state;
-            btnUsePreset.disabled = state;
-        }
-
-        async function callAction(url) {
-            setBusyState(true);
-            setStatus("UPDATING");
-            const csrfToken = getCookie("csrftoken");
-            const headers = {};
-            if (csrfToken) {
-                headers["X-CSRFToken"] = csrfToken;
+            function setBusyState(state) {
+                busy = state;
+                btnUpdateFirmware.disabled = state;
+                btnUsePreset.disabled = state;
             }
-            try {
-                const response = await fetch(url, {
-                    method: "POST",
-                    headers: headers,
-                });
-                if (!response.ok) {
+
+            async function callAction(url) {
+                setBusyState(true);
+                setStatus("UPDATING");
+                const csrfToken = getCookie("csrftoken");
+                const headers = {};
+                if (csrfToken) {
+                    headers["X-CSRFToken"] = csrfToken;
+                }
+                try {
+                    const response = await fetch(url, {
+                        method: "POST",
+                        headers: headers,
+                    });
+                    if (!response.ok) {
+                        setStatus("FAILED");
+                        return;
+                    }
+                    setStatus("ONLINE");
+                } catch (e) {
                     setStatus("FAILED");
-                    return;
+                } finally {
+                    setBusyState(false);
                 }
-                setStatus("ONLINE");
-            } catch (e) {
-                setStatus("FAILED");
-            } finally {
-                setBusyState(false);
             }
+
+            btnUpdateFirmware.addEventListener("click", function (event) {
+                event.preventDefault();
+                callAction(options.firmwareUrl);
+            });
+
+            btnUsePreset.addEventListener("click", function (event) {
+                event.preventDefault();
+                callAction(options.presetUrl);
+            });
+
+            refreshStatus();
+            setInterval(refreshStatus, 5000);
         }
 
-        btnUpdateFirmware.addEventListener("click", function () {
-            callAction("/api/device/update-firmware/");
+        createDeviceController({
+            statusDotId: "device-status-dot",
+            statusTextId: "device-status-text",
+            firmwareBtnId: "btn-update-firmware",
+            presetBtnId: "btn-use-preset",
+            statusUrl: "/api/device/status/",
+            firmwareUrl: "/api/device/update-firmware/",
+            presetUrl: "/api/device/use-preset/",
         });
 
-        btnUsePreset.addEventListener("click", function () {
-            callAction("/api/device/use-preset/");
+        createDeviceController({
+            statusDotId: "data-status-dot",
+            statusTextId: "data-status-text",
+            firmwareBtnId: "btn-data-update-firmware",
+            presetBtnId: "btn-data-use-preset",
+            statusUrl: "/api/data/status/",
+            firmwareUrl: "/api/data/update-firmware/",
+            presetUrl: "/api/data/use-preset/",
         });
-
-        refreshStatus();
-        setInterval(refreshStatus, 5000);
     </script>
 </body>
 </html>

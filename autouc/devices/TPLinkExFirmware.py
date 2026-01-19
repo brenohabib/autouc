@@ -1,5 +1,6 @@
 import time
 import re
+from pathlib import Path
 from playwright.sync_api import Playwright, sync_playwright, expect
 
 
@@ -24,7 +25,8 @@ def run(playwright: Playwright) -> None:
     page.get_by_role("link", name="- Atualização de Firmware").click()
     page.locator('a', has_text="EX141").click()
     file_input = page.locator('#filename')
-    file_input.set_input_files("./firmware.bin")
+    firmware_path = Path(__file__).resolve().parent / "firmware.bin"
+    file_input.set_input_files(str(firmware_path))
     page.get_by_role("button", name="Atualização").click()
     time.sleep(4)
     context.close()

@@ -1,5 +1,6 @@
 import time
 import re
+from pathlib import Path
 from playwright.sync_api import Playwright, sync_playwright, expect
 
 
@@ -19,7 +20,8 @@ def run(playwright: Playwright) -> None:
     page.get_by_role("link", name="Ferramentas de Sistema").click()
     page.get_by_role("link", name="- Backup e Recuperação").click()
     file_input = page.locator('#filename')
-    file_input.set_input_files("./preset.bin")
+    preset_path = Path(__file__).resolve().parent / "preset.bin"
+    file_input.set_input_files(str(preset_path))
     page.locator("#t_restore").click()
     time.sleep(4)
     context.close()
