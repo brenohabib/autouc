@@ -3,7 +3,7 @@ from django.http import JsonResponse
 from django.shortcuts import render
 from django.views.decorators.http import require_GET, require_POST
 
-from ..devices import TPLinkExFirmware, TPLinkExPreset, DataFirmware, DataPreset
+from ..devices import TPLinkExFirmware, TPLinkExPreset
 
 
 DEVICE_IP = "192.168.0.1"
@@ -46,23 +46,5 @@ def use_preset(request):
     try:
         TPLinkExPreset.run_standalone()
         return JsonResponse({"ok": True})
-    except Exception as exc:
-        return JsonResponse({"ok": False, "error": str(exc)}, status=500)
-
-
-@require_POST
-def data_update_firmware(request):
-    try:
-        DataFirmware.run_standalone()
-        return JsonResponse({"ok": True})
-    except Exception as exc:
-        return JsonResponse({"ok": False, "error": str(exc)}, status=500)
-
-
-@require_POST
-def data_use_preset(request):
-    try:
-        DataPreset.run_standalone()
-        return JsonResponse({"ok": True})
-    except Exception as exc:
-        return JsonResponse({"ok": False, "error": str(exc)}, status=500)
+    except Exception:
+        return JsonResponse({"ok": False}, status=500)
